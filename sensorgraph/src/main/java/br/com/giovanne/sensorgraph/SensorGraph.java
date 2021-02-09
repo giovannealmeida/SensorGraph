@@ -124,7 +124,6 @@ public class SensorGraph extends View {
             recalculateXOffset();
             oY = mHeight / 2f;
             SUB_LIMIT_LINE = mHeight - SUP_LIMIT_LINE;
-            mPathsX[1].moveTo(0, oY);
         });
 
         if (attrs != null) {
