@@ -10,6 +10,8 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewTreeObserver;
+
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import java.text.DecimalFormat;
@@ -57,6 +59,7 @@ public class SensorGraph extends View {
     private int backgroundColor;
     //Determina se o gráfico já está se movendo para a esquerda (os pontos preencheram toda a largura do gráfico)
     private boolean isScrolling;
+    private ViewTreeObserver.OnGlobalLayoutListener listener;
 
     public SensorGraph(Context context) {
         super(context);
@@ -118,13 +121,14 @@ public class SensorGraph extends View {
         mPathsZ = new Path[2];
         mPathsZ[1] = new Path();
 
-        getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+        listener = () -> {
             mWidth = getWidth();
             mHeight = getHeight();
             recalculateXOffset();
             oY = mHeight / 2f;
             SUB_LIMIT_LINE = mHeight - SUP_LIMIT_LINE;
-        });
+        };
+        getViewTreeObserver().addOnGlobalLayoutListener(listener);
 
         if (attrs != null) {
             TypedArray t = getContext().obtainStyledAttributes(attrs, R.styleable.SensorGraph);
@@ -256,5 +260,11 @@ public class SensorGraph extends View {
     public void setMaxAmountValues(int maxAmountValues) {
         this.mMaxAmountValues = maxAmountValues;
         recalculateXOffset();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        getViewTreeObserver().removeOnGlobalLayoutListener(listener);
     }
 }
